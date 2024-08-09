@@ -1,0 +1,16 @@
+parted /dev/sdb mklabel gpt mkpart primary xfs 0% 100%
+pvcreate /dev/sdb1
+vgcreate vgdata /dev/sdb1
+lvcreate -l 100%FREE -n lv_data vgdata
+mkfs -t xfs /dev/vgdata/lv_data
+vim /etc/fstab
+systemctl daemon-reload
+mount -a
+
+[root@server03 ~]# egrep -v "^#|^$" /etc/fstab | column -t
+/dev/mapper/rhel-root                      /              xfs   defaults                    0  0
+UUID=d2f07aa2-b9d3-467f-88ad-44d2ea0d8a17  /boot          xfs   defaults                    0  0
+UUID=9A91-0886                             /boot/efi      vfat  umask=0077,shortname=winnt  0  2
+/dev/mapper/rhel-home                      /home          xfs   defaults                    0  0
+/dev/mapper/rhel-swap                      none           swap  defaults                    0  0
+/dev/mapper/vgdata-lv_data                 /data/testing  xfs   defaults                    0  0
